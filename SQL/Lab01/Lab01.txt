@@ -1,0 +1,68 @@
+SELECT * FROM KHOA;
+CREATE DATABASE QuanlySV;
+GO
+
+USE QuanlySV;
+GO
+
+CREATE TABLE KHOA (
+    MaKhoa VARCHAR(10) NOT NULL, -- Khóa chính
+    TenKhoa NVARCHAR(100) NULL,  -- Tên khoa (dùng NVARCHAR cho tiếng Việt)
+    NamThanhLap INT NULL,        -- Năm thành lập
+    PRIMARY KEY (MaKhoa)         -- Thiết lập khóa chính
+);
+GO
+
+CREATE TABLE SINHVIEN (
+    MaSV VARCHAR(10) NOT NULL,
+    TenSV NVARCHAR(100) NULL,
+    NamSinh INT NULL,
+    MaKhoa VARCHAR(10) NULL,     -- Khóa ngoại tham chiếu đến KHOA
+    PRIMARY KEY (MaSV),
+    FOREIGN KEY (MaKhoa) REFERENCES KHOA(MaKhoa) -- Thiết lập khóa ngoại
+);
+GO
+
+
+CREATE TABLE MONHOC (
+    MaMH VARCHAR(10) NOT NULL,
+    TenMH NVARCHAR(100) NULL,
+    TinChi INT NULL,
+    MaKhoa VARCHAR(10) NULL,     -- Môn học do khoa nào phụ trách
+    PRIMARY KEY (MaMH),
+    FOREIGN KEY (MaKhoa) REFERENCES KHOA(MaKhoa)
+);
+GO
+
+
+CREATE TABLE DIEUKIEN (
+    MaMH VARCHAR(10) NOT NULL,        -- Môn học chính
+    MaMH_Truoc VARCHAR(10) NOT NULL,  -- Môn phải học trước
+    PRIMARY KEY (MaMH, MaMH_Truoc),   -- Khóa chính 
+    FOREIGN KEY (MaMH) REFERENCES MONHOC(MaMH),
+    FOREIGN KEY (MaMH_Truoc) REFERENCES MONHOC(MaMH) 
+);
+GO
+
+
+CREATE TABLE HOCPHAN (
+    MaHP VARCHAR(10) NOT NULL,
+    MaMH VARCHAR(10) NOT NULL,
+    HocKy VARCHAR(10) NULL, 
+    Nam INT NULL,           -- Năm học
+    GiaoVien NVARCHAR(100) NULL,
+    PRIMARY KEY (MaHP),
+    FOREIGN KEY (MaMH) REFERENCES MONHOC(MaMH)
+);
+GO
+
+CREATE TABLE KETQUA (
+    MaSV VARCHAR(10) NOT NULL,
+    MaHP VARCHAR(10) NOT NULL,
+    Diem FLOAT NULL,      
+    PRIMARY KEY (MaSV, MaHP), 
+    FOREIGN KEY (MaSV) REFERENCES SINHVIEN(MaSV),
+    FOREIGN KEY (MaHP) REFERENCES HOCPHAN(MaHP)
+);
+GO
+

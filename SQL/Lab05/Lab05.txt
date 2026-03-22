@@ -1,0 +1,100 @@
+drop DATABASE quanlythuctap
+Create DataBase quanlythuctap
+Go
+Use quanlythuctap
+Go
+Drop table Sinhvien_Detai;
+Drop table Sinhvien;
+Drop table Detai;
+
+Create table Sinhvien(
+	masv Varchar(10) PRIMARY KEY,
+	ten nvarchar(50),
+	quequan nvarchar(50),
+	ngaysinh Date Not Null,
+	hocluc float Not Null Check(hocluc Between 0 and 10)
+	);
+
+Create table Detai(
+	madt varchar(10) PRIMARY KEY,
+	tendetai nvarchar(150),
+	chunhiemdetai nvarchar(100),
+	kinhphi int not null check(kinhphi<100000000) Default 0,
+	);
+
+Create table Sinhvien_Detai(
+	masv Varchar(10),
+	madt varchar(10),
+	noiTT nvarchar(150),
+	QD int,
+	KQ float not null Check(KQ Between 0 and 10)
+	PRIMARY KEY (masv,madt),
+
+	Constraint FK_SVDT_MASV Foreign KEY (masv) references Sinhvien(masv),
+	Constraint FK_SVDT_MADT Foreign KEY (madt) references Detai(madt),
+	);
+
+Insert into Sinhvien(masv,ten,quequan,ngaysinh,hocluc) values
+	('52400066',N'Ha Tuan Anh',N'TPHCM', '04/20/2006',9.5 ),
+	('52400067',N'Anh Ha Tuan',N'TPHCM', '05/21/2006',8.5 ),
+	('52400068',N'Ha Anh Tuan',N'Ha Noi', '04/21/2005',7 ),
+	('52400069',N'Ha Anh',N'Hai Phong', '04/05/2003',8.6),
+	('52400070',N'Ha Tuan',N'Ha Noi', '03/21/1006',9.9)
+
+
+Insert into Detai(madt,tendetai,chunhiemdetai,kinhphi) values
+	('DT01',N'Moi truong',N'Long', 1000000),
+	('DT02',N'Khoa hoc',N'Huynh', 200000),
+	('DT03',N'us',N'Tai', 10000000),
+	('DT04',N'O nhiem',N'Hoa', 5000000),
+	('DT05',N'Cong nghe',N'Long', 10000000)
+
+Insert into Sinhvien_Detai(masv,madt,noiTT,QD,KQ) values
+	('52400066','DT02',N'Nguyen Tri Phuong',1000, 10),
+	('52400067','DT01',N'HTP',1000,7),
+	('52400068','DT03',N'Ca Mau',1000,5),
+	('52400069','DT04',N'Nguyen Hue',1000, 9),
+	('52400070','DT05',N'CMT8',1000, 10),
+	('52400070','DT02',N'Tan Son Nhat',1000, 5)
+
+
+select * from Sinhvien;
+select * from Detai;
+select * from Sinhvien_Detai;
+
+drop view cau2_a
+Create view cau2_a AS
+	Select sv.ten, sv.hocluc  from Sinhvien sv
+	where
+		(CASE
+		WHEN DATEADD(YEAR, DATEDIFF(YEAR,sv.ngaysinh,GETDATE()),sv.ngaysinh) > GETDATE()
+		THEN DATEDIFF(YEAR,sv.ngaysinh,GETDATE()) -1
+		ELSE DATEDIFF(YEAR,sv.ngaysinh,GETDATE())
+		END
+		) <20 and sv.hocluc>8.5 
+select * from cau2_a
+
+Create view cau2_b AS
+	Select tendetai, chunhiemdetai from Detai
+	where kinhphi >1000000
+select * from cau2_b
+
+Create view cau2_c AS
+	Select sv.masv,sv.ten, sv.ngaysinh,sv.hocluc, svdt.KQ
+	from Sinhvien sv JOIN Sinhvien_Detai svdt ON sv.masv = svdt.masv
+	where sv.hocluc >8 AND svdt.KQ >8
+select * from cau2_c
+
+Create view cau2_d AS
+	Select chunhiemdetai 
+	From Detai dt JOIN Sinhvien_Detai svdt ON dt.madt = svdt.madt JOIN Sinhvien sv ON sv.masv = svdt.masv
+	where quequan = 'TPHCM'
+
+select * from cau2_d
+
+Create view cau2_e AS
+	Select sv.masv,sv.ten, sv.ngaysinh,sv.hocluc, svdt.KQ
+	from Sinhvien sv JOIN Sinhvien_Detai svdt ON sv.masv = svdt.masv
+	where sv.hocluc >8 AND svdt.KQ >8
+select * from cau2_e
+
